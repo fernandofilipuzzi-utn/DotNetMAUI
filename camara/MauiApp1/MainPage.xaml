@@ -15,6 +15,12 @@
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Ejemplo 1" />
 
+            <Image x:Name="myImage" 
+                  BackgroundColor="Gray"
+                  WidthRequest="300"
+                  HeightRequest="300"
+                  HorizontalOptions="Center" />
+
             <Button
                 x:Name="btnPermiso"
                 Text="Solicitar permisos" 
