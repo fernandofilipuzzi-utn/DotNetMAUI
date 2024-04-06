@@ -22,10 +22,10 @@
                   HorizontalOptions="Center" />
 
             <Button
-                x:Name="btnPermiso"
-                Text="Solicitar permisos" 
-                SemanticProperties.Hint="Hola mundo"
-                Clicked="btnPermiso_Clicked"
+                x:Name="btnTomarFoto"
+                Text="Tomar foto" 
+                SemanticProperties.Hint="Tomar foto"
+                Clicked="btnTomarFoto_Clicked"
                 HorizontalOptions="Fill" />
 
         </VerticalStackLayout>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Plugin.Media;
+using Plugin.Media.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,80 +12,43 @@ namespace MauiApp1
     {
         //https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/device-media/picker?view=net-maui-8.0&tabs=windows
         
-        public async Task<string> TakePhoto(ContentPage pageContext)
+        public async Task<MediaFile> TakePhoto(ContentPage pageContext)
         {
             if (MediaPicker.Default.IsCaptureSupported == false)
             {
-                await pageContext.DisplayAlert("No Camera", ":( No camera available.", "OK");
-                return "1";
-            }
-
-            bool permisosConcedidos = await CheckForCameraAndGalleryPermission();
-            if (permisosConcedidos)
-            {
-                FileResult? photo = await MediaPicker.Default.CapturePhotoAsync(
-                    new MediaPickerOptions()
-                    { 
-                        Title="kk"
-                    }
-                );
-
-                if (photo == null)
-                    return "2";
-
-                try
-                {
-                    var imageAsBase64String = Convert.ToBase64String(await ConvertFileToByteArray(photo));
-                    return imageAsBase64String;
-                } catch (Exception ex)
-                {
-                    return ex.Message.ToString();
-                }
-            }
-            else
-            {
-                await pageContext.DisplayAlert("Habilitar permisos", "Debes habilitar los permisos para continuar.", "OK");
-                return "3";
-            }             
-        }
-
-        public async Task<ImageSource> TakePhoto1(ContentPage pageContext)
-        {
-            if (MediaPicker.Default.IsCaptureSupported == false)
-            {
-                await pageContext.DisplayAlert("No Camera", ":( No camera available.", "OK");
+                //await pageContext.DisplayAlert("No Camera", ":( No camera available.", "OK");
+                await Shell.Current.DisplayAlert("ahí va calorina", ":( No camera available.", "ok", "cancel");
                 return null;
             }
 
             bool permisosConcedidos = await CheckForCameraAndGalleryPermission();
             if (permisosConcedidos)
             {
-                
 
                 try
                 {
-                    FileResult? photo = await MediaPicker.Default.CapturePhotoAsync(
-                    new MediaPickerOptions()
-                    {
-                        Title = "kk",
-                        
-                    }
-                    );
+                    var options = new StoreCameraMediaOptions {
+                        Directory = "prueba",
+                        SaveToAlbum = true,
+                        CompressionQuality = 75,
+                        CustomPhotoSize = 50,
+                        PhotoSize = PhotoSize.Medium,
+                        MaxWidthHeight = 1000,
+                    };
+                    var photo = await CrossMedia.Current.TakePhotoAsync(options);
 
-                    if (photo == null)
-                        return null;
-
-                    var stream = await photo.OpenReadAsync();
-                    return ImageSource.FromStream(() => stream);
+                    await Shell.Current.DisplayAlert("Path", photo.Path, "ok", "cancel");
+                    return photo;
                 }
                 catch (Exception ex)
                 {
-                    return ex.Message.ToString();
+                    await Shell.Current.DisplayAlert("Error interno", ex.Message.ToString(), "ok","cancel");
+                    return null;
                 }
             }
             else
             {
-                await pageContext.DisplayAlert("Habilitar permisos", "Debes habilitar los permisos para continuar.", "OK");
+                await Shell.Current.DisplayAlert("No has dado tu permiso!", "Debes habilitar los permisos para tomar una foto", "ok", "cancel");
                 return null;
             }
         }
@@ -110,15 +75,14 @@ namespace MauiApp1
             return false;
         }
 
-        private async Task<byte[]> ConvertFileToByteArray(FileResult imageFile)
+        private byte[]ConvertFileToByteArray(MediaFile imageFile)
         {
             // Convert Image to bytes
-            byte[] imageAsBytes;
-
-            using (Stream sourceStream = await imageFile.OpenReadAsync())
+            byte[] imageAsBytes= new byte[0];
             using (var memoryStream = new MemoryStream())
             {
-                sourceStream.CopyTo(memoryStream);
+                imageFile.GetStream().CopyTo(memoryStream);
+                imageFile.Dispose();
                 imageAsBytes = memoryStream.ToArray();
             }
 

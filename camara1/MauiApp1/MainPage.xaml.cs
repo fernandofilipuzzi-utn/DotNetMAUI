@@ -11,20 +11,19 @@ namespace MauiApp1
             _device = new DeviceHelper();
         }
 
-        private async void btnPermiso_Clicked(object sender, EventArgs e)
+        private async void btnTomarFoto_Clicked(object sender, EventArgs e)
         {
             lbnHola.Text = "Hola, Fernando!";
 
-            //string imagen=await _device.TakePhoto(this);
-            var imagen = await _device.TakePhoto1(this);
+            var result = await _device.TakePhoto(this);
 
-            if (imagen != null)
+            if (result != null)
             {
-                myImage.Source = imagen;
-                await Shell.Current.DisplayAlert("ahí va calorina", "hecho!", "ok");
+                myImage.Source = result?.Path; //imagen;
+                await Shell.Current.DisplayAlert("Foto realizada", "Visualizando foto!", "ok");
             }
             else
-                await Shell.Current.DisplayAlert("ahí no va!", "nada", "ok");
+                await Shell.Current.DisplayAlert("No hay foto que mostrar", "Error", "ok");
         }
     }
 }
